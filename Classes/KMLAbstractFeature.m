@@ -21,6 +21,8 @@
 #import "KMLStyle.h"
 #import "KMLDocument.h"
 #import "KMLData.h"
+#import "KMLStyleMap.h"
+#import "KMLPair.h"
 
 @implementation KMLAbstractFeature {
     NSString *_visibilityValue;
@@ -296,6 +298,7 @@
     return style;
 }
 
+
 - (NSString *)extendedDataValueForName:(NSString *)name
 {
     if (self.extendedData && self.extendedData.dataList) {
@@ -373,6 +376,110 @@
     if (self.extendedData) {
         [self.extendedData kml:kml indentationLevel:indentationLevel];
     }
+}
+
+/// MTN additions
+- (KMLStyle *)styleForState:(KMLStyleState)state
+{
+  NSString *styleStateString = [[KMLType valueForStyleState:state] lowercaseString];
+  KMLStyle *style;
+  NSString *styleID;
+  KMLElement *element = self.parent;
+  while (element) {
+    if ([element isKindOfClass:[KMLDocument class]]) {
+      KMLDocument *document = (KMLDocument *) element;
+      for (KMLAbstractStyleSelector *styleSelector in document.styleSelectors) {
+    if ([styleSelector isKindOfClass:[KMLStyleMap class]]) {
+      for (KMLPair *pair in [(KMLStyleMap *) styleSelector pairs]) {
+        if ([[pair.key lowercaseString] isEqualToString:styleStateString]) {
+          styleID = [pair.styleUrl substringFromIndex:1];
+          break;
+        }
+      }
+    }
+      }
+    }
+    element = element.parent;
+
+  }
+
+  NSLog(@"styleID: %@", styleID);
+  if ([styleID length] < 1) {
+    return nil;
+  }
+  // copy of 'style' accessor
+  element = self.parent;
+  while (element) {
+    if ([element isKindOfClass:[KMLDocument class]]) {
+      KMLDocument *document = (KMLDocument *)element;
+      for (KMLAbstractStyleSelector *styleSelector in document.styleSelectors) {
+    if ([styleSelector isKindOfClass:[KMLStyle class]]) {
+      KMLStyle *sharedStyle = (KMLStyle *)styleSelector;
+      if ([styleID isEqualToString:sharedStyle.objectID]) {
+        if (!style) {
+          style = [KMLStyle new];
+          style.parent = self;
+        }
+
+        if (sharedStyle.iconStyle) {
+          style.iconStyle = sharedStyle.iconStyle;
+        }
+        if (sharedStyle.labelStyle) {
+          style.labelStyle = sharedStyle.labelStyle;
+        }
+        if (sharedStyle.lineStyle) {
+          style.lineStyle = sharedStyle.lineStyle;
+        }
+        if (sharedStyle.polyStyle) {
+          style.polyStyle = sharedStyle.polyStyle;
+        }
+        if (sharedStyle.balloonStyle) {
+          style.balloonStyle = sharedStyle.balloonStyle;
+        }
+        if (sharedStyle.listStyle) {
+          style.listStyle = sharedStyle.listStyle;
+        }
+        break;
+      }
+    }
+      }
+    }
+
+    element = element.parent;
+  }
+
+
+  for (KMLAbstractStyleSelector *styleSelector in self.styleSelectors) {
+    if ([styleSelector isKindOfClass:[KMLStyle class]]) {
+      KMLStyle *childStyle = (KMLStyle *)styleSelector;
+
+      if (!style) {
+    style = [KMLStyle new];
+    style.parent = self;
+      }
+
+      if (childStyle.iconStyle) {
+    style.iconStyle = childStyle.iconStyle;
+      }
+      if (childStyle.labelStyle) {
+    style.labelStyle = childStyle.labelStyle;
+      }
+      if (childStyle.lineStyle) {
+    style.lineStyle = childStyle.lineStyle;
+      }
+      if (childStyle.polyStyle) {
+    style.polyStyle = childStyle.polyStyle;
+      }
+      if (childStyle.balloonStyle) {
+    style.balloonStyle = childStyle.balloonStyle;
+      }
+      if (childStyle.listStyle) {
+    style.listStyle = childStyle.listStyle;
+      }
+    }
+  }
+
+  return style;
 }
 
 @end

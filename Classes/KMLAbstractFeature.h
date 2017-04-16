@@ -311,5 +311,7 @@
  */
 - (void)addExtendedDataWithName:(NSString *)name value:(NSString *)value;
 
+/// obtain a style if is part of a StyleMap
+- (KMLStyle *)styleForState:(KMLStyleState)state;
 
 @end

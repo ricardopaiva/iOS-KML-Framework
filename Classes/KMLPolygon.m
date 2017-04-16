@@ -175,7 +175,7 @@
         if (innerEl) {
             eachBlock([[class alloc] initWithXMLElement:innerEl parent:self]);
         }
-        el = [TBXML nextSiblingNamed:[class tagName] searchFromElement:el];
+        el = [TBXML nextSiblingNamed:name searchFromElement:el];
     }
 }
 
