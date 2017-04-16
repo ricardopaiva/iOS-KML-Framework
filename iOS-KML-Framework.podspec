@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
-  s.name         = "iOS-KML-Framework"
-  s.version      = "1.0.0"
+  s.name         = "iOS-KML-Framework (RPM Custom Version)"
+  s.version      = "1.0.1"
   s.summary      = "The iOS framework for parsing/generating KML files."
   s.description  = <<-DESC
                     This is a iOS framework for parsing/generating KML files.
